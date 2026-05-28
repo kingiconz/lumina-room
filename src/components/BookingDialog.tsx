@@ -1,3 +1,4 @@
+import * as React from "react";
 import { useState } from "react";
 import { addBooking, getBookings } from "@/lib/store";
 import type { Room } from "@/lib/rooms";

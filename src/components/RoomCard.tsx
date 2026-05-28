@@ -19,39 +19,9 @@ export function RoomCard({ room, onBook }: { room: Room; onBook: (r: Room) => vo
           <StatusBadge status={status} />
         </div>
 
-        <div className="mt-4 flex flex-wrap gap-1.5">
-          <span className="rounded-full bg-secondary px-2.5 py-1 text-xs text-secondary-foreground">
-            {room.capacity} seats
-          </span>
-          {room.amenities.slice(0, 2).map((a) => (
-            <span key={a} className="rounded-full bg-accent px-2.5 py-1 text-xs text-accent-foreground">{a}</span>
-          ))}
-        </div>
-
-        <div className="mt-5 space-y-1 border-t pt-4 text-sm">
-          {current ? (
-            <div>
-              <div className="text-xs uppercase tracking-wide text-muted-foreground">In session</div>
-              <div className="font-medium">{current.title}</div>
-              <div className="text-muted-foreground">until {formatTime(current.end)}</div>
-            </div>
-          ) : next ? (
-            <div>
-              <div className="text-xs uppercase tracking-wide text-muted-foreground">Next meeting</div>
-              <div className="font-medium">{next.title}</div>
-              <div className="text-muted-foreground">{formatTime(next.start)} — {formatTime(next.end)}</div>
-            </div>
-          ) : (
-            <div>
-              <div className="text-xs uppercase tracking-wide text-muted-foreground">Schedule</div>
-              <div className="text-muted-foreground">No upcoming meetings today</div>
-            </div>
-          )}
-        </div>
-
         <button
           onClick={() => onBook(room)}
-          className="mt-5 w-full rounded-xl bg-gradient-primary px-4 py-2.5 text-sm font-semibold text-primary-foreground shadow-soft transition-smooth hover:shadow-elegant"
+          className="mt-8 w-full rounded-xl bg-gradient-primary px-4 py-2.5 text-sm font-semibold text-primary-foreground shadow-soft transition-smooth hover:shadow-elegant"
         >
           Book this room
         </button>

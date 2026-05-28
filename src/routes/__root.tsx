@@ -1,3 +1,4 @@
+import * as React from "react";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import {
   Outlet,
@@ -8,7 +9,7 @@ import {
   Scripts,
 } from "@tanstack/react-router";
 
-import appCss from "../styles.css?url";
+import "../styles.css";
 
 function NotFoundComponent() {
   return (
@@ -72,18 +73,15 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
     meta: [
       { charSet: "utf-8" },
       { name: "viewport", content: "width=device-width, initial-scale=1" },
-      { title: "Atrium — Smart Meeting Room Management" },
+      { title: "e-Crime Bureau — Smart Meeting Room Management" },
       { name: "description", content: "Real-time meeting room availability, booking and provisioning for the modern enterprise." },
-      { property: "og:title", content: "Atrium — Smart Meeting Room Management" },
+      { property: "og:title", content: "e-Crime Bureau — Smart Meeting Room Management" },
       { property: "og:description", content: "Real-time meeting room availability, booking and provisioning for the modern enterprise." },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary" },
     ],
     links: [
-      {
-        rel: "stylesheet",
-        href: appCss,
-      },
+      { rel: "icon", href: "/assets/logo.png" },
     ],
   }),
   shellComponent: RootShell,

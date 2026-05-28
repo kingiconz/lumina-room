@@ -26,11 +26,16 @@ const emit = () => listeners.forEach((l) => l());
 
 const isBrowser = typeof window !== "undefined";
 
+const cache = new Map<string, any>();
+
 function read<T>(key: string, fallback: T): T {
   if (!isBrowser) return fallback;
+  if (cache.has(key)) return cache.get(key);
   try {
     const raw = localStorage.getItem(key);
-    return raw ? (JSON.parse(raw) as T) : fallback;
+    const value = raw ? (JSON.parse(raw) as T) : fallback;
+    cache.set(key, value);
+    return value;
   } catch {
     return fallback;
   }
@@ -39,13 +44,24 @@ function read<T>(key: string, fallback: T): T {
 function write<T>(key: string, value: T) {
   if (!isBrowser) return;
   localStorage.setItem(key, JSON.stringify(value));
+  cache.set(key, value);
   emit();
   // ping other tabs
   window.dispatchEvent(new StorageEvent("storage", { key }));
 }
 
 if (isBrowser) {
-  window.addEventListener("storage", () => emit());
+  // Clear any existing dummy data from localStorage on first run after this update
+  if (localStorage.getItem("mrm.seeded.v1") !== "true") {
+    localStorage.removeItem(BOOKINGS_KEY);
+    localStorage.removeItem(DEVICES_KEY);
+    localStorage.setItem("mrm.seeded.v1", "true");
+  }
+
+  window.addEventListener("storage", (e) => {
+    if (e.key) cache.delete(e.key);
+    emit();
+  });
   // tick every 10s so countdowns/status refresh
   setInterval(emit, 10_000);
 }
@@ -54,34 +70,6 @@ function subscribe(cb: () => void) {
   listeners.add(cb);
   return () => listeners.delete(cb);
 }
-
-// ------- seed mock data -------
-function seed() {
-  if (!isBrowser) return;
-  if (localStorage.getItem(BOOKINGS_KEY)) return;
-  const now = new Date();
-  const mk = (offsetMin: number, durMin: number, roomCode: string, title: string, organizer: string): Booking => {
-    const s = new Date(now.getTime() + offsetMin * 60000);
-    const e = new Date(s.getTime() + durMin * 60000);
-    return {
-      id: crypto.randomUUID(),
-      roomCode, title, organizer,
-      start: s.toISOString(), end: e.toISOString(),
-      createdAt: new Date().toISOString(),
-    };
-  };
-  const seed: Booking[] = [
-    mk(-15, 60, "gf-gchq", "Quarterly Strategy Review", "Ama Mensah"),
-    mk(20, 45, "gf-gmr", "Client Onboarding — Volta Corp", "Kojo Asare"),
-    mk(-5, 30, "ff-knmr", "Engineering Standup", "Nana Owusu"),
-    mk(120, 90, "sf-nmmr", "Board Meeting", "Akosua Boateng"),
-    mk(45, 120, "sf-eca", "Cyber Forensics Workshop", "Dr. Adjei"),
-    mk(180, 60, "tf-ybmr", "Design Review", "Yaa Serwah"),
-  ];
-  write(BOOKINGS_KEY, seed);
-  write(DEVICES_KEY, []);
-}
-if (isBrowser) seed();
 
 // ------- bookings -------
 export function getBookings(): Booking[] {
@@ -146,22 +134,30 @@ export function isAdmin(): boolean {
   return localStorage.getItem(ADMIN_KEY) === "1";
 }
 
+const EMPTY_BOOKINGS: Booking[] = [];
+const EMPTY_DEVICES: Device[] = [];
+
 // ------- hooks -------
 export function useBookings() {
-  return useSyncExternalStore(subscribe, getBookings, () => [] as Booking[]);
+  return useSyncExternalStore(subscribe, getBookings, () => EMPTY_BOOKINGS);
 }
+
 export function useDevices() {
-  return useSyncExternalStore(subscribe, getDevices, () => [] as Device[]);
+  return useSyncExternalStore(subscribe, getDevices, () => EMPTY_DEVICES);
 }
+
 export function useIsAdmin() {
   return useSyncExternalStore(subscribe, isAdmin, () => false);
 }
+
 export function useNow(intervalMs = 1000) {
   const [now, setNow] = useState(() => new Date());
+
   useEffect(() => {
     const id = setInterval(() => setNow(new Date()), intervalMs);
     return () => clearInterval(id);
   }, [intervalMs]);
+
   return now;
 }
 

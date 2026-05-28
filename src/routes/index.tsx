@@ -35,16 +35,18 @@ function Home() {
   }, [bookings, now]);
 
   const filtered = useMemo(() => {
-    return ROOMS.filter((r) => (floor === "All" || r.floor === floor) && (q.trim() === "" || r.name.toLowerCase().includes(q.toLowerCase())));
+    return ROOMS
+      .filter((r) => (floor === "All" || r.floor === floor) && (q.trim() === "" || r.name.toLowerCase().includes(q.toLowerCase())))
+      .sort((a, b) => a.name.length - b.name.length);
   }, [floor, q]);
 
   const todayBookings = useMemo(() => {
-    const startOfDay = new Date(); startOfDay.setHours(0, 0, 0, 0);
-    const endOfDay = new Date(); endOfDay.setHours(23, 59, 59, 999);
+    const startOfDay = new Date(now); startOfDay.setHours(0, 0, 0, 0);
+    const endOfDay = new Date(now); endOfDay.setHours(23, 59, 59, 999);
     return bookings
       .filter((b) => +new Date(b.start) >= +startOfDay && +new Date(b.start) <= +endOfDay)
       .sort((a, b) => +new Date(a.start) - +new Date(b.start));
-  }, [bookings]);
+  }, [bookings, now]);
 
   return (
     <div className="min-h-screen bg-gradient-subtle">
@@ -116,7 +118,7 @@ function Home() {
               <h2 className="text-xl font-semibold">Today's Schedule</h2>
               <p className="text-sm text-muted-foreground">All meetings happening today, across every room.</p>
             </div>
-            <div className="text-sm text-muted-foreground">{new Date().toLocaleDateString(undefined, { weekday: "long", month: "long", day: "numeric" })}</div>
+            <div className="text-sm text-muted-foreground">{now.toLocaleDateString("en-US", { weekday: "long", month: "long", day: "numeric" })}</div>
           </div>
           {todayBookings.length === 0 ? (
             <div className="p-10 text-center text-muted-foreground">No meetings scheduled for today.</div>
