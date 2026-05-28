@@ -1,4 +1,3 @@
-import * as React from "react";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import {
   Outlet,
@@ -9,7 +8,7 @@ import {
   Scripts,
 } from "@tanstack/react-router";
 
-import "../styles.css";
+import appCss from "../styles.css?url";
 
 function NotFoundComponent() {
   return (
@@ -73,15 +72,22 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
     meta: [
       { charSet: "utf-8" },
       { name: "viewport", content: "width=device-width, initial-scale=1" },
-      { title: "e-Crime Bureau — Smart Meeting Room Management" },
+      { title: "Atrium — Smart Meeting Room Management" },
       { name: "description", content: "Real-time meeting room availability, booking and provisioning for the modern enterprise." },
-      { property: "og:title", content: "e-Crime Bureau — Smart Meeting Room Management" },
+      { property: "og:title", content: "Atrium — Smart Meeting Room Management" },
       { property: "og:description", content: "Real-time meeting room availability, booking and provisioning for the modern enterprise." },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary" },
+      { name: "twitter:title", content: "Atrium — Smart Meeting Room Management" },
+      { name: "twitter:description", content: "Real-time meeting room availability, booking and provisioning for the modern enterprise." },
+      { property: "og:image", content: "https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev/c67136c0-c35e-4e98-a286-7d11d57163eb/id-preview-666167a6--169ddc0b-46a3-4338-9d6d-b96034b6cfa7.lovable.app-1779973296254.png" },
+      { name: "twitter:image", content: "https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev/c67136c0-c35e-4e98-a286-7d11d57163eb/id-preview-666167a6--169ddc0b-46a3-4338-9d6d-b96034b6cfa7.lovable.app-1779973296254.png" },
     ],
     links: [
-      { rel: "icon", href: "/assets/logo.png" },
+      {
+        rel: "stylesheet",
+        href: appCss,
+      },
     ],
   }),
   shellComponent: RootShell,
